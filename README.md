@@ -1,5 +1,3 @@
-Here’s your **README** in plain text with emojis so you can directly copy and paste into GitHub:
-
 ---
 
 # 🖥️ Virtual PC Controller
@@ -130,12 +128,10 @@ python mouse.py    # Virtual Mouse
 
 ---
 
-## 👤 Author
+## 👤 Author  
+**Bhabani S Biswal** – Python & AI/ML Developer  
+📧 Email: [bhabanibiswalb17@gmail.com](mailto:bhabanibiswalb17@gmail.com)  
+🔗 GitHub: [Bhabani S Biswal](https://github.com/bhabanisbiswal)  
 
-**Your Name** – Python & AI/ML Developer
-📧 Email: [your.email@example.com](mailto:your.email@example.com)
-🔗 GitHub: [Your GitHub Profile](https://github.com/yourusername)
 
 ---
-
-If you want, I can now make **a catchy GitHub title and short description** so your repo looks more attractive when shared. That would go right above this README in GitHub settings.
