@@ -1,8 +1,6 @@
----
+# 🖥️ Virtual PC Controller
 
- 🖥️ Virtual PC Controller
-
-This project allows you to **control your PC virtually using hand gestures** via a webcam.
+This project allows you to **control your PC virtually using hand gestures** via a webcam.  
 It combines **computer vision** 🧠 and **gesture recognition** ✋ to create two main features:
 
 1. ⌨ **Virtual Keyboard** – Type by hovering your finger over keys on a virtual keyboard displayed on the screen.
