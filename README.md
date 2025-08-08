@@ -116,7 +116,7 @@ python mouse.py    # Virtual Mouse
 
 ## 📸 Demo
 
-*(You can add screenshots or GIFs here showing the project in action)*
+![image alt](https://github.com/bhabanisbiswal/Virtual-PC-Controller/blob/d09d02cc230f955bf4f5c059ef218194fca1a57b/vlcsnap-2025-08-08-11h41m11s043.png)
 
 ---
 
