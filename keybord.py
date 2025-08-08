@@ -1,27 +1,25 @@
 import cv2
-from time import sleep
+from time import time
 import numpy as np
 import cvzone
 from pynput.keyboard import Controller
-from HandTrackingModule import handDetector  # Import your custom module
+from HandTrackingModule import handDetector  # Your custom hand tracking module
 
-# Initialize camera
+# Initialize webcam
 cap = cv2.VideoCapture(0)
-cap.set(3, 1280)  # Set width
-cap.set(4, 720)  # Set height
+cap.set(3, 1280)  # Width
+cap.set(4, 720)   # Height
 
-# Initialize HandDetector
+# Initialize hand detector
 detector = handDetector(detectionCon=0.8)
 
-# Define keyboard keys layout
+# Keyboard layout
 keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
         ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";"],
         ["Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"]]
 
 finalText = ""
 keyboard = Controller()
-keyPressed = False  # Flag to prevent duplicate key presses
-lastKey = None  # Track the last pressed key
 
 
 class Button:
@@ -37,17 +35,10 @@ for i in range(len(keys)):
     for j, key in enumerate(keys[i]):
         buttonList.append(Button([100 * j + 50, 100 * i + 50], key))
 
-
-def drawAll(img, buttonList):
-    """Draw all buttons on the screen."""
-    for button in buttonList:
-        x, y = button.pos
-        w, h = button.size
-        cvzone.cornerRect(img, (x, y, w, h), 20, rt=0)
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 255), cv2.FILLED)
-        cv2.putText(img, button.text, (x + 20, y + 65),
-                    cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 4)
-    return img
+# Hover and click tracking
+hoverStartTime = None
+hoveredButton = None
+clickedButtons = {}  # Stores recently clicked buttons with timestamp
 
 
 # Main loop
@@ -56,51 +47,71 @@ while True:
     if not success:
         break
 
-    # Detect hands
     img = detector.findHands(img, draw=True)
     lmList, bboxInfo = detector.findPosition(img)
 
-    # Draw keyboard
-    img = drawAll(img, buttonList)
+    # Draw all buttons
+    for button in buttonList:
+        x, y = button.pos
+        w, h = button.size
+
+        # Show clicked button in green for 0.5s
+        if button.text in clickedButtons:
+            if time() - clickedButtons[button.text] < 0.5:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), cv2.FILLED)
+            else:
+                del clickedButtons[button.text]
+                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 255), cv2.FILLED)
+        else:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 255), cv2.FILLED)
+
+        cvzone.cornerRect(img, (x, y, w, h), 20, rt=0)
+        cv2.putText(img, button.text, (x + 20, y + 65),
+                    cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 4)
 
     if lmList:
+        index_x, index_y = lmList[8][1], lmList[8][2]
+        hovering = False
+
         for button in buttonList:
             x, y = button.pos
             w, h = button.size
 
-            # Check if index finger is over a button
-            if x < lmList[8][1] < x + w and y < lmList[8][2] < y + h:
-                cv2.rectangle(img, (x - 5, y - 5), (x + w + 5, y + h + 5), (175, 0, 175), cv2.FILLED)
-                cv2.putText(img, button.text, (x + 20, y + 65),
-                            cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 4)
+            # Check if finger is over this button
+            if x < index_x < x + w and y < index_y < y + h:
+                hovering = True
 
-                # Check distance between index and middle finger
-                l, _, _ = detector.findDistance(8, 12, img, draw=False)
+                if hoveredButton != button.text:
+                    hoveredButton = button.text
+                    hoverStartTime = time()
+                else:
+                    duration = time() - hoverStartTime
+                    cv2.putText(img, f"{int(duration)}s", (x + 20, y - 10),
+                                cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 0), 2)
 
-                if l < 30 and (not keyPressed or lastKey != button.text):
-                    keyboard.press(button.text)
-                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), cv2.FILLED)
-                    cv2.putText(img, button.text, (x + 20, y + 65),
-                                cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 4)
-                    finalText += button.text
-                    keyPressed = True
-                    lastKey = button.text  # Store last pressed key
-                    sleep(0.15)
+                    if duration >= 2:
+                        keyboard.press(button.text)
+                        keyboard.release(button.text)
+                        finalText += button.text
+                        print(f"Pressed: {button.text}")
+                        clickedButtons[button.text] = time()
+                        hoveredButton = None
+                        hoverStartTime = None
+                break
 
-        # Reset key press flag when finger moves away from keys
-        if all(not (x < lmList[8][1] < x + w and y < lmList[8][2] < y + h) for button in buttonList):
-            keyPressed = False
-            lastKey = None  # Reset last key
+        if not hovering:
+            hoveredButton = None
+            hoverStartTime = None
 
-    # Display the typed text
+    # Draw typed text area
     cv2.rectangle(img, (50, 350), (700, 450), (175, 0, 175), cv2.FILLED)
     cv2.putText(img, finalText, (60, 430),
                 cv2.FONT_HERSHEY_PLAIN, 5, (255, 255, 255), 5)
 
-    # Show image
     cv2.imshow("Image", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+# Cleanup
 cap.release()
 cv2.destroyAllWindows()
