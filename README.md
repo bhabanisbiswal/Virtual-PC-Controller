@@ -118,6 +118,7 @@ python mouse.py    # Virtual Mouse
 
 ![image alt](https://github.com/bhabanisbiswal/Virtual-PC-Controller/blob/d09d02cc230f955bf4f5c059ef218194fca1a57b/vlcsnap-2025-08-08-11h41m11s043.png)
 
+![image alt](https://github.com/bhabanisbiswal/Virtual-PC-Controller/blob/68bcfe88d190f9ef89cf64c44faee2743bfdc6e1/vlcsnap-2025-08-08-11h41m30s566.png)
 ---
 
 ## 🔮 Future Improvements
