@@ -77,7 +77,7 @@ Virtual_pc_controller/
 1. 📂 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/Virtual_pc_controller.git
+git clone https://github.com/bhabanibiswal/Virtual_PC_Controller.git
 ```
 
 2. 📁 Navigate into the folder:
